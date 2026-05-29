@@ -1,0 +1,65 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+@ini_set('memory_limit', '-1');
+// Dual-mode autoload: local clone vs. composer-global / project install.
+foreach ([
+    __DIR__ . '/../vendor/autoload.php',       // local dev: composer install in this repo
+    __DIR__ . '/../../../autoload.php',         // composer global / project-local require
+] as $autoload) {
+    if (is_file($autoload)) {
+        require $autoload;
+        break;
+    }
+}
+
+use Dpt\McpPhpmdWarm\PhpmdTool;
+use Mcp\Server;
+use Mcp\Server\Transport\StdioTransport;
+
+// Parse our own CLI flags before building the server.
+$workingDir = null;
+$rulesets = null;
+foreach (array_slice($argv, 1) as $arg) {
+    if (str_starts_with($arg, '--working-dir=')) {
+        $workingDir = substr($arg, 14);
+    } elseif (str_starts_with($arg, '--rulesets=')) {
+        $rulesets = substr($arg, 11);
+    }
+}
+
+if ($workingDir !== null) {
+    if (!is_dir($workingDir)) {
+        fwrite(STDERR, "mcp-phpmd-warm: --working-dir not a directory: {$workingDir}\n");
+        exit(2);
+    }
+    chdir($workingDir);
+}
+
+// Hand the pinned rulesets to PhpmdTool via env — read once when the tool's
+// PhpmdRunner is constructed. Resolve relative ruleset XML paths against the
+// working dir so they survive the chdir above.
+if ($rulesets !== null) {
+    putenv('MCP_PHPMD_RULESETS=' . $rulesets);
+}
+
+$server = Server::builder()
+    ->setServerInfo('mcp-phpmd-warm', '0.1.0')
+    ->setLogger(new class extends \Psr\Log\AbstractLogger {
+        public function log($level, $message, array $context = []): void
+        {
+            if (\in_array($level, ['error', 'critical', 'alert', 'emergency'], true)) {
+                fwrite(STDERR, "[$level] $message\n");
+                if (isset($context['exception']) && $context['exception'] instanceof \Throwable) {
+                    $e = $context['exception'];
+                    fwrite(STDERR, '  ' . $e::class . ': ' . $e->getMessage() . "\n");
+                }
+            }
+        }
+    })
+    ->setDiscovery(dirname(__DIR__), ['src'])
+    ->build();
+
+$server->run(new StdioTransport());

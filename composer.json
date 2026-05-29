@@ -1,0 +1,26 @@
+{
+    "name": "dpt/mcp-phpmd-warm",
+    "description": "Warm-process MCP server for PHPMD. Keeps PHPMD's classes + parsed rulesets bootstrapped across calls — faster per-file mess detection vs cold CLI invocation. Compatible with any MCP client (Claude Desktop, Cline, Continue, Zed, custom).",
+    "type": "project",
+    "license": "proprietary",
+    "keywords": ["mcp", "model-context-protocol", "phpmd", "php", "mess-detector", "static-analysis", "claude", "ai-tools"],
+    "homepage": "https://github.com/Digital-Process-Tools/mcp-phpmd-warm",
+    "require": {
+        "php": ">=8.2",
+        "mcp/sdk": "^0.5",
+        "phpmd/phpmd": "^2.15",
+        "symfony/finder": "^7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Dpt\\McpPhpmdWarm\\": "src/"
+        }
+    },
+    "bin": ["bin/mcp-phpmd-warm"],
+    "config": {
+        "sort-packages": true
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10"
+    }
+}
