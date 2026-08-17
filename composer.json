@@ -7,7 +7,7 @@
     "homepage": "https://github.com/Digital-Process-Tools/mcp-phpmd-warm",
     "require": {
         "php": ">=8.2",
-        "mcp/sdk": "^0.5",
+        "mcp/sdk": "^0.7.1",
         "phpmd/phpmd": "^2.15",
         "symfony/finder": "^7.4"
     },
