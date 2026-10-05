@@ -6,6 +6,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-10-05
+
 ### Changed
 
 - **Breaking:** requires `phpmd/phpmd` `^3.0` (and with it `pdepend/pdepend` 3). PHPMD 2.x is no longer supported. PHPMD 3 changes rule semantics: thresholds now fire when a value is strictly greater than the configured limit, not equal to it, and several rule properties were renamed (old names stay accepted as aliases). See PHPMD's `UPGRADING.md` before pinning rulesets.
