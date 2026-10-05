@@ -8,7 +8,7 @@ use PHPMD\PHPMD;
 use PHPMD\Renderer\JSONRenderer;
 use PHPMD\Report;
 use PHPMD\RuleSetFactory;
-use PHPMD\Writer\StreamWriter;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 /**
  * Holds a warm PHPMD process across multiple analyse calls.
@@ -46,28 +46,18 @@ final class PhpmdRunner
         $this->warm = true;
 
         $factory = new RuleSetFactory();
-        $ruleSetList = $factory->createRuleSets($this->rulesets);
+        $ruleSetList = $factory->createRuleSets(explode(',', $this->rulesets));
 
-        $stream = fopen('php://memory', 'r+');
-        if ($stream === false) {
-            throw new \RuntimeException('Could not open memory stream for renderer output.');
-        }
-
+        $output = new BufferedOutput();
         $renderer = new JSONRenderer();
-        $renderer->setWriter(new StreamWriter($stream));
+        $renderer->setWriter($output);
 
         $phpmd = new PHPMD();
-        $report = new Report();
-
-        $phpmd->processFiles($path, [], [$renderer], $ruleSetList, $report);
-
-        rewind($stream);
-        $output = stream_get_contents($stream);
-        fclose($stream);
+        $phpmd->processFiles([$path], [], [$renderer], $ruleSetList, new Report());
 
         return [
             'exit_code' => $phpmd->hasViolations() ? 2 : 0,
-            'output' => $output === false ? '' : $output,
+            'output' => $output->fetch(),
             'warm_boot' => $warmBoot,
         ];
     }
