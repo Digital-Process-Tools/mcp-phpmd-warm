@@ -6,6 +6,18 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-10-05
+
+### Changed
+
+- **Breaking:** requires `phpmd/phpmd` `^3.0` (and with it `pdepend/pdepend` 3). PHPMD 2.x is no longer supported. PHPMD 3 changes rule semantics: thresholds now fire when a value is strictly greater than the configured limit, not equal to it, and several rule properties were renamed (old names stay accepted as aliases). See PHPMD's `UPGRADING.md` before pinning rulesets.
+- Runner ported to the PHPMD 3 API: ruleset list and input path are passed as arrays, and the JSON renderer writes into a Symfony Console `BufferedOutput` instead of the removed `PHPMD\Writer\StreamWriter`. The JSON report keeps its shape; PHPMD 3 adds a `relativePath` field per file.
+- `symfony/console` `^7.4` is now a direct requirement.
+
+### Fixed
+
+- The server announced itself as `0.1.0` in its MCP `serverInfo` after the 0.1.1 release.
+
 ## [0.1.1] — 2026-08-22
 
 ### Changed

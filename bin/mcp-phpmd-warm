@@ -46,7 +46,7 @@ if ($rulesets !== null) {
 }
 
 $server = Server::builder()
-    ->setServerInfo('mcp-phpmd-warm', '0.1.0')
+    ->setServerInfo('mcp-phpmd-warm', '0.2.0')
     ->setLogger(new class extends \Psr\Log\AbstractLogger {
         public function log($level, $message, array $context = []): void
         {
